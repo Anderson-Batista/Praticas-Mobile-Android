@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/button_update"
+        android:layout_width="180dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:onClick="buttonUpdateClick"
+        android:text="Atualizar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_save" />
+
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="181dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="21dp"
+        android:layout_marginEnd="16dp"
+        android:onClick="buttonDeleteClick"
+        android:text="Apagar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_query" />
+
+    <EditText
+        android:id="@+id/edit_name"
+        android:layout_width="400dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Nome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edit_grade"
+        android:layout_width="400dp"
+        android:layout_height="41dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Nota"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_name" />
+
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="180dp"
+        android:layout_height="62dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="33dp"
+        android:onClick="buttonInsertClick"
+        android:text="Inserir"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_grade" />
+
+    <Button
+        android:id="@+id/button_query"
+        android:layout_width="184dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="16dp"
+        android:onClick="buttonQueryClick"
+        android:text="Consultar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_grade" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
