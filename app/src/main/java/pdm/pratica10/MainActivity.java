@@ -1,14 +1,27 @@
 package pdm.pratica10;
 
+import static android.provider.UserDictionary.Words._ID;
+import static pdm.pratica10.db.SchoolContract.Student.COLUMN_NAME_STUDENT_GRADE;
+import static pdm.pratica10.db.SchoolContract.Student.COLUMN_NAME_STUDENT_NAME;
+import static pdm.pratica10.db.SchoolContract.Student.TABLE_NAME;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+
+import pdm.pratica10.db.SchoolDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,58 +50,95 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void buttonInsertClick(View view) {
-        String name = this.nameEditText.getText().toString();
-        String grade = this.gradeEditText.getText().toString();
+        String name =
+                ((EditText) findViewById(R.id.edit_name)).getText().toString();
+        int grade = Integer.parseInt(
+                ((EditText) findViewById(R.id.edit_grade)).getText().toString());
 
-        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(name, grade);
-        editor.apply();
+        SchoolDbHelper dbHelper = new SchoolDbHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Toast.makeText(this, "Salvo: " + name, Toast.LENGTH_SHORT).show();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_NAME_STUDENT_NAME, name);
+        values.put(COLUMN_NAME_STUDENT_GRADE, grade);
+
+        long newId = db.insert(TABLE_NAME, null, values);
+
+        Toast toast = Toast.makeText(this, "Registro adicionado. ID = " + newId, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     public void buttonQueryClick(View view) {
-        String name = this.nameEditText.getText().toString();
-        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-        String grade = prefs.getString(name, "[Não encontrado]");
-        this.gradeEditText.setText(grade);
+        String name =
+                ((EditText)findViewById(R.id.edit_name)).getText().toString();
+
+        SchoolDbHelper dbHelper = new SchoolDbHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String [] projection = {_ID,
+                COLUMN_NAME_STUDENT_NAME,
+                COLUMN_NAME_STUDENT_GRADE};
+        String selection = COLUMN_NAME_STUDENT_NAME + " LIKE ?";
+        String[] selectionArgs = { name + "%" };
+        String sortOrder = COLUMN_NAME_STUDENT_GRADE + " DESC";
+        Cursor c = db.query(TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null, null,
+                sortOrder);
+        ArrayList<CharSequence> data = new ArrayList<CharSequence>();
+        c.moveToFirst();
+        while (!c.isAfterLast()) {
+            String entry = c.getInt(c.getColumnIndex(_ID)) + ": ";
+            entry += c.getString(
+                    c.getColumnIndex(COLUMN_NAME_STUDENT_NAME)) + " = ";
+            entry += c.getInt(
+                    c.getColumnIndex(COLUMN_NAME_STUDENT_GRADE));
+            data.add(entry);
+            c.moveToNext();
+        }
+        c.close();
+        Intent intent = new Intent(this, QueryResultActivity.class);
+        intent.putCharSequenceArrayListExtra("data", data);
+        startActivity(intent);
     }
 
     public void buttonUpdateClick(View view) {
-        String name = this.nameEditText.getText().toString();
-        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+        String name =
+                ((EditText)findViewById(R.id.edit_name)).getText().toString();
+        int grade = Integer.parseInt(
+                ((EditText) findViewById(R.id.edit_grade)).getText().toString());
 
-        String grade = prefs.getString(name, "[Não encontrado]");
-        if (grade.equals("[Não encontrado]")) {
-            Toast.makeText(this, "Erro! O nome informado não existe",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
+        SchoolDbHelper dbHelper = new SchoolDbHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String newGrade = this.gradeEditText.getText().toString();
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(name, newGrade);
-        editor.apply();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_STUDENT_GRADE, grade);
 
-        Toast.makeText(this, "Atualizado com sucesso", Toast.LENGTH_SHORT).show();
+        String selection = COLUMN_NAME_STUDENT_NAME + " LIKE ?";
+        String[] selectionArgs = { name + "" };
+
+        int count = db.update(TABLE_NAME, values, selection, selectionArgs);
+
+        Toast toast = Toast.makeText(this, "Registros atualizados: " + count, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     public void buttonDeleteClick(View view) {
-        String name = this.nameEditText.getText().toString();
-        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+        String name =
+                ((EditText)findViewById(R.id.edit_name)).getText().toString();
 
-        String grade = prefs.getString(name, "[Não encontrado]");
-        if (grade.equals("[Não encontrado]")) {
-            Toast.makeText(this, "Erro! O nome informado não existe",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
+        SchoolDbHelper dbHelper = new SchoolDbHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(name);
-        editor.apply();
+        String selection = COLUMN_NAME_STUDENT_NAME + " LIKE ?";
+        String[] selectionArgs = { name + "" };
 
-        Toast.makeText(this, "Removido com sucesso", Toast.LENGTH_SHORT).show();
+        int count = db.delete(TABLE_NAME, selection, selectionArgs);
+
+        Toast toast = Toast.makeText(this,
+                "Registros deletados: " + count, Toast.LENGTH_SHORT);
+        toast.show();
     }
 }
